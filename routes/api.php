@@ -22,3 +22,5 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::post('logout', 'Auth\LoginController@logout');
     Route::get('me', 'Auth\LoginController@me');
 });
+
+Route::apiResource('categories', 'CategoriesController');
