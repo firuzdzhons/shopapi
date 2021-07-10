@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCategory;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 
 class CategoriesController extends Controller
@@ -19,8 +20,8 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        return response()->json(
-            Category::with('subcategories')->get()
+        return CategoryResource::collection(
+            Category::with('children')->parents()->ordered()->get()
         );
     }
 

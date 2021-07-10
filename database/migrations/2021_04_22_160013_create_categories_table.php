@@ -15,12 +15,14 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('parent_id')->unsigned()->index()->nullable();
-            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('set null');
             $table->string('name');
-            $table->text('description')->nullable();
+            $table->string('slug')->unique();
+            $table->integer('order')->nullable();
+            $table->bigInteger('parent_id')->unsigned()->index()->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('set null'); 
         });
     }
 
