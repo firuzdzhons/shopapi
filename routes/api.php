@@ -23,4 +23,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::get('me', 'Auth\LoginController@me');
 });
 
-Route::apiResource('categories', 'CategoriesController');
+Route::get('categories', 'CategoriesController@index');
+
+
+//adminpanel routes
+Route::group(['middleware' => 'role:admin', 'prefix' => 'admin'], function(){
+    Route::apiResource('categories', 'Admin\CategoriesController');
+});
