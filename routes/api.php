@@ -33,5 +33,12 @@ Route::group(['prefix' => 'products'], function(){
 //adminpanel routes
 Route::group(['middleware' => 'role:admin', 'prefix' => 'admin'], function(){
     Route::apiResource('categories', 'Admin\CategoriesController');
-    Route::apiResource('products', 'Admin\ProductsController');
+
+    Route::group(['prefix' => 'products'], function(){
+        Route::get('/', 'Admin\ProductsController@index');
+        Route::post('/', 'Admin\ProductsController@store');
+        Route::post('/update/{product}', 'Admin\ProductsController@update');
+        Route::delete('/delete', 'Admin\ProductsController@destroy');
+    });
+  
 });

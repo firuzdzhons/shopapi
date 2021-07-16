@@ -3,35 +3,38 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SaveProduct;
-use App\Models\Category;
+use App\Http\Requests\CreateProduct;
+use App\Http\Requests\UpdateProduct;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 
 class ProductsController extends Controller
 {
     public function index()
     {
-       return response()->json(
+       return ProductResource::collection(
            Product::paginate(20)
        );    
     }
 
-    public function store(SaveProduct $request){
+    public function store(CreateProduct $request){
         try {
-            $product =Product::create([
+            $product = Product::create([
                 'name' => $request->name,
                 'category_id' => $request->category_id,
                 'description' => $request->description,
                 'price' => $request->price
             ]);
 
-            return response()->json(['message' => 'created', 'product' => $product]);
+            $product->addMedia($request->image)->toMediaCollection();
+
+            return response()->json(['message' => 'created', 'product' => new ProductResource($product)]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 405);
         }
     }
 
-    public function update(SaveProduct $request, Product $product)
+    public function update(UpdateProduct $request, Product $product)
     {
         try {
             $product->update([
@@ -41,7 +44,12 @@ class ProductsController extends Controller
                 'price' => $request->price
             ]);
 
-            return response()->json(['message' => 'updated', 'category' => $product->refresh()]);
+            if ($request->hasFile('new_image') && $product->getFirstMedia()) {
+                $product->getFirstMedia()->delete();
+                $product->addMedia($request->new_image)->toMediaCollection();
+            }
+
+            return response()->json(['message' => 'updated', 'category' => new ProductResource($product->refresh())]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 405);
         }
